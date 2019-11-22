@@ -46,7 +46,7 @@ hold off
 
 %% b) Is this chain time-homogeneous?
 
-% No, plot reveals that values of transition probability matrix changes
+% No, plot reveals that values of transition probabilities matrix changes
 % over time
 
 %% c) If it is time-homogeneous:
