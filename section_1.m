@@ -4,7 +4,7 @@ clear;  % Erase all existing variables.
 workspace;  % Make sure the workspace panel is showing.
 
 State_size = 5;
-N_chain = 10000;
+N_chain = 100000;
 Time = 100;
 pi0 = ones(1,5)/5;
 X = chain_1(N_chain, Time, pi0);
@@ -46,22 +46,20 @@ hold off
 
 %% b) Is this chain time-homogeneous?
 
-% No, plot reveals that values of transition probabilities matrix changes
-% over time
+% Yes, chain 1 is time-homogeneous
 
 %% c) If it is time-homogeneous:
 % c.1) Find its time-homogeneous transition probability and save it as the variable P hat in the 
 % file P_hat_chain_i.mat where i is the number of the chain. Choose N_chain and Time in a way to
-% have an error (on average) less than 10?3 for each elements of P - explain your approach.
+% have an error (on average) less than 10-3 for each elements of P - explain your approach.
 % c.2) Draw the underlying graph of the chain.
 
-% It's not time-homogeneous
+% TODO
 
 %% d) If it is not time-homogeneous, explain the dynamics of P(t) over time, e.g. how it changes,
 % whether it converges, etc.
 
-% Yes, they converge (some of them after time = 40, some of them much
-% earlier). TODO: rewrite
+% TODO
 
 %% e) When pi0 is an uniform distribution, estimate pi(t) (i.e. the distribution of states at time t,
 % i.e. X(t+1,:)), and plot the values of its elements over time.
