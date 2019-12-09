@@ -1,3 +1,8 @@
+clc;    % Clear the command window.
+close all;  % Close all figures (except those of imtool.)
+clear;  % Erase all existing variables.
+workspace;  % Make sure the workspace panel is showing.
+
 % Assume that chain i is time-homogeneous. The aim of this part is to use the Metropolis-Hasting
 % algorithm to change this chain in a way to have the arbitrary distribution pi_a as its limiting distribution.
 % Given Xt as the state of the chain at time t, the next state Xt+1 can be sampled as [Xt; Xt+1]
@@ -27,16 +32,22 @@ X = MP_chain_1(N_chain, Time, pi_a, x0);
 % 1. pi_a = [16,8,4,2,1]/31;
 % 2. pi_a = [1,1,4,1,1]/8;
 % 3. pi_a = [4,2,1,2,4]/13;
+
+pi_a_desc = {'Desired distribution: [16,8,4,2,1]/31', ...
+             'Desired distribution: [1,1,4,1,1]/8', ...
+             'Desired distribution: [4,2,1,2,4]/13'};
+pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
+
 % do the following steps:
+
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
-pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 Time = 100;
 N_chain = 1000;
 state_size = 5;
 
 for pi_a_ind = 1:size(pi_a_all, 1)
-    fprintf('Pi option %d\n', pi_a_ind)
+    display(pi_a_desc(pi_a_ind))
     
     for init_state = 1:5    
         X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
@@ -53,12 +64,58 @@ end
 
 % TODO Make use of 1F code when implemented for finding limiting distribution
 
-%% b.2) Plot the total variation distance over time, and analyze the effect of the initial state x0 on the
-% convergence rate of the algorithm. Does it depend on the desired distribution pi_a? If yes, explain
-% how.
+%% b.2) Plot the total variation distance over time, and analyze the effect 
+% of the initial state x0 on the convergence rate of the algorithm. Does it
+% depend on the desired distribution pi_a? If yes, explain how.
 
+% Compute TV
+Time = 50;
+N_chain = 1000;
+state_size = 5;
+total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
-% Make use of 1G code when implemented
+for pi_a_ind = 1:size(pi_a_all, 1)
+    for init_state = 1:state_size
+        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
+        
+        for time = 1:size(X, 1)
+            cur_distrubution = estimate_distribution(X, time, state_size)';
+            total_variation(pi_a_ind, time, init_state) = ...
+                sum(abs(pi_a_all(pi_a_ind, :) - cur_distrubution)) / 2; 
+        end
+    end
+end
+
+%% Plot TV
+colors = ['k','b','r','g','m'];
+
+figure
+for pi_a_ind = 1:size(pi_a_all, 1)
+    subplot(3, 1, pi_a_ind)
+    title(pi_a_desc(pi_a_ind))
+    xlim([0 size(X, 1)])
+    xlabel('Time')
+    ylabel('Total variation')
+    hold on
+    grid on
+    for init_state = 1:state_size
+        plot(1:size(X, 1), total_variation(pi_a_ind, :, init_state), ...
+            'DisplayName', sprintf('%i initial state', init_state), ...
+            'color', colors(init_state))
+    end
+end
+legend('show');
+hold off
+
+% From plot we can see that both desired distribution and initial state
+% effect on convergence rate. We can point out two observations: 
+% First, the more desired distribution is close to uniform distribution,
+% the faster chain converges if we consider average convergence rate among
+% all initial states.
+% Second, the more state is likely in desired distribution, the faster
+% chain converges if we pick this state as initial.
+
+% TODO Make use of 1G code when implemented
 
 %% b.3) For each distribution pi_a, can you estimate (numerically) an upper-bound for Te when
 % e = 0.005?
