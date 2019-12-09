@@ -42,8 +42,8 @@ pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
-Time = 100;
-N_chain = 10000;
+Time = 300;
+N_chain = 1000;
 state_size = 5;
 
 for pi_a_ind = 1:size(pi_a_all, 1)
@@ -54,7 +54,6 @@ for pi_a_ind = 1:size(pi_a_all, 1)
 %         X = MP_chain_1_v2(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
         
         limiting_distribution = estimate_distribution(X, Time, state_size)';
-%         limiting_distribution = estimate_distribution(X, Time, state_size)
 
         err_mae = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
         fprintf('For initial state %d error is %f\n', init_state, err_mae)
