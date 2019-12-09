@@ -7,14 +7,7 @@
 % For each time-homogeneous Markov Chain among the 4 chains (i.e. chain 1.p, chain 2.p, chain 3.p,
 % and chain 4.p)
 
-% Chains 1,... are time-homogeneous
-Xprev = 1;
-pair = chain_1(1, 2, Xprev);
-Xnew = pair(2);
-% Finding acceptance rate
-
-
-
+% Chains 1, 2 are time-homogeneous, let's analyze them
 
 %% a) Write a function as X = MP_chain_i(N_chain, Time, pi_a, x0) which produces N_chain ? N
 % realisations of the modified version (in a way to have the limiting distribution pi_a) of chain i with
@@ -26,32 +19,53 @@ Xnew = pair(2);
 
 pi_a = [16,8,4,2,1]/31;
 x0 = 1;
-X = MP_chain_1(10, 10, pi_a, x0);
+Time = 10;
+N_chain = 10;
+X = MP_chain_1(N_chain, Time, pi_a, x0);
 
 %%  b) For each of your chains, and for each of the cases
 % 1. pi_a = [16,8,4,2,1]/31;
 % 2. pi_a = [1,1,4,1,1]/8;
 % 3. pi_a = [4,2,1,2,4]/13;
 % do the following steps:
-
-
-
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
+pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
+Time = 100;
+N_chain = 1000;
+state_size = 5;
 
+for pi_a_ind = 1:size(pi_a_all, 1)
+    fprintf('Pi option %d\n', pi_a_ind)
+    
+    for init_state = 1:5    
+        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
+%         X = MP_chain_1_v2(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
+        
+        limiting_distribution = estimate_distribution(X, Time, state_size)';
+%         limiting_distribution = estimate_distribution(X, Time, state_size)
 
-% Make use of 1G code when implemented
+        err_mse = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
+        fprintf('For initial state %d error is %f\n', init_state, err_mse)
+        
+    end
+end
+
+% TODO Make use of 1F code when implemented for finding limiting distribution
 
 %% b.2) Plot the total variation distance over time, and analyze the effect of the initial state x0 on the
 % convergence rate of the algorithm. Does it depend on the desired distribution pi_a? If yes, explain
 % how.
 
 
+% Make use of 1G code when implemented
 
 %% b.3) For each distribution pi_a, can you estimate (numerically) an upper-bound for Te when
 % e = 0.005?
 
 
-%% c) For each of the three choices of pi_a in p
+%% c) For each of the three choices of pi_a in part b), which chain has a better convergence rate? Can 
+% you explain your observations intuitively?
+
 
 
