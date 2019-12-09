@@ -4,7 +4,8 @@ function X = MP_chain_1(N_chain, Time, pi_a, x0)
     ld = load('P_hat_chain_1.mat');
     prob_matrix = ld.P_hat';
     
-    % Computing new transition matrix
+    % Since state space is quite small (only 5 possible states, let's 
+    % compute of the whole new transition matrix
     state_size = size(prob_matrix, 1);
     nominator = repmat(pi_a, state_size, 1) .* prob_matrix';
     denominator = nominator';
@@ -15,9 +16,7 @@ function X = MP_chain_1(N_chain, Time, pi_a, x0)
     for i = 1:state_size
         prob_matrix_new(i, i) = 1 - sum(prob_matrix_new(i, :));
     end
-    
-	prob_matrix_new;
-    
+        
     % Generating chain realisations
     X = zeros(Time + 1, N_chain);
     X(1, :) = x0; % Set initial state

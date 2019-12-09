@@ -43,7 +43,7 @@ pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
 Time = 100;
-N_chain = 1000;
+N_chain = 10000;
 state_size = 5;
 
 for pi_a_ind = 1:size(pi_a_all, 1)
@@ -56,11 +56,14 @@ for pi_a_ind = 1:size(pi_a_all, 1)
         limiting_distribution = estimate_distribution(X, Time, state_size)';
 %         limiting_distribution = estimate_distribution(X, Time, state_size)
 
-        err_mse = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
-        fprintf('For initial state %d error is %f\n', init_state, err_mse)
+        err_mae = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
+        fprintf('For initial state %d error is %f\n', init_state, err_mae)
         
     end
 end
+
+% Looking at differences between desired distributions and generated ones
+% we can see that modeified chain has needed limiting distribution
 
 % TODO Make use of 1F code when implemented for finding limiting distribution
 
@@ -69,9 +72,6 @@ end
 % depend on the desired distribution pi_a? If yes, explain how.
 
 % Compute TV
-Time = 50;
-N_chain = 1000;
-state_size = 5;
 total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
 for pi_a_ind = 1:size(pi_a_all, 1)
@@ -79,9 +79,9 @@ for pi_a_ind = 1:size(pi_a_all, 1)
         X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
         
         for time = 1:size(X, 1)
-            cur_distrubution = estimate_distribution(X, time, state_size)';
+            cur_distribution = estimate_distribution(X, time, state_size)';
             total_variation(pi_a_ind, time, init_state) = ...
-                sum(abs(pi_a_all(pi_a_ind, :) - cur_distrubution)) / 2; 
+                sum(abs(pi_a_all(pi_a_ind, :) - cur_distribution)) / 2; 
         end
     end
 end
@@ -119,7 +119,24 @@ hold off
 
 %% b.3) For each distribution pi_a, can you estimate (numerically) an upper-bound for Te when
 % e = 0.005?
+eps = 0.005;
 
+display('Computing mixing time')
+for pi_a_ind = 1:size(pi_a_all, 1)
+    display(pi_a_desc(pi_a_ind))
+    
+    for time = 1:size(total_variation, 2)
+        if max(total_variation(pi_a_ind, time, :)) < eps
+            display(sprintf('Mixing time is %d', time))
+            break
+        end
+        
+        if time == size(total_variation, 2)
+            display('Mixing time was not found. Please increase considering time')
+            fprintf('TV on max time is %d\n', max(total_variation(pi_a_ind, time, :)))
+        end
+    end
+end
 
 %% c) For each of the three choices of pi_a in part b), which chain has a better convergence rate? Can 
 % you explain your observations intuitively?
