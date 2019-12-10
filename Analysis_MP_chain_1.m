@@ -43,50 +43,35 @@ pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
-Time = 10;
-N_chain = 100;
-state_size = 5;
 
-for pi_a_ind = 1:size(pi_a_all, 1)
-    display(pi_a_desc(pi_a_ind))
-    
-    for init_state = 1:5    
-        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
-%         X = MP_chain_1_v2(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
-
-        distribution = estimate_distribution(X, Time, state_size);
-        limiting_distribution = distribution(:, Time)';
-        
-        err_mae = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
-        fprintf('For initial state %d error is %f\n', init_state, err_mae)
-        
-    end
-end
-
-% Looking at differences between desired distributions and generated ones
-% we can see that modeified chain has needed limiting distribution
-
-% TODO Make use of 1F code when implemented for finding limiting distribution
+% Since value of total variation at moment T where T is good enough can be
+% an evidence that modified chain has needed limiting distribution, we
+% decided to join tasks b.1 and b.2
 
 %% b.2) Plot the total variation distance over time, and analyze the effect 
 % of the initial state x0 on the convergence rate of the algorithm. Does it
 % depend on the desired distribution pi_a? If yes, explain how.
-Time = 10;
-N_chain = 100;
+Time = 150;
+N_chain = 10^5;
 state_size = 5;
 
 % Compute TV
 total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
 for pi_a_ind = 1:size(pi_a_all, 1)
+    display(pi_a_desc(pi_a_ind))
+    
     for init_state = 1:state_size
         pi_a = pi_a_all(pi_a_ind, :);
         
-        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
-
+        X = MP_chain_1(N_chain, Time, pi_a, init_state);
+        
         estimated_distrubution = estimate_distribution(X, Time, state_size);
         total_variation(pi_a_ind, :, init_state) = ...
                 sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
+        
+        error = total_variation(pi_a_ind, Time, init_state);
+        fprintf('For initial state %d error is %f\n', init_state, error)
     end
 end
 
@@ -97,7 +82,7 @@ figure
 for pi_a_ind = 1:size(pi_a_all, 1)
     subplot(3, 1, pi_a_ind)
     title(pi_a_desc(pi_a_ind))
-    xlim([1 size(X, 1)])
+    xlim([1 min(100, size(X, 1))]) % After Time=100 curve is very close to 0
     xlabel('Time')
     ylabel('Total variation')
     hold on
@@ -142,8 +127,8 @@ for pi_a_ind = 1:size(pi_a_all, 1)
     end
 end
 
-%% c) For each of the three choices of pi_a in part b), which chain has a better convergence rate? Can 
-% you explain your observations intuitively?
+%% c) For each of the three choices of pi_a in part b), which chain has a 
+% better convergence rate? Can you explain your observations intuitively?
 
 
 
