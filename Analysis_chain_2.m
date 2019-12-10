@@ -7,7 +7,7 @@ State_size = 5;
 N_chain = 100000;
 Time = 100;
 pi0 = ones(1,5)/5;
-X = chain_1(N_chain, Time, pi0);
+X = chain_2(N_chain, Time, pi0);
 
 %% a) Estimate P(t), and plot the values of its elements over time - for a reasonable range of time.
 
@@ -41,7 +41,7 @@ hold off
 
 %% b) Is this chain time-homogeneous?
 
-% Yes, from the plot we can observe that chain 1 is time-homogeneous, as the entries of the transition probability 
+% Yes, from the plot we can observe that chain 2 is time-homogeneous, as the entries of the transition probability 
 % matrix over time t vary only slightly given a large N_chain.
 
 %% c) If it is time-homogeneous:
@@ -50,7 +50,7 @@ hold off
 % have an error (on average) less than 10-3 for each elements of P - explain your approach.
 
 
-% Since we know that our chain_1 is time-homogenous, thus in order to
+% Since we know that our chain_2 is time-homogenous, thus in order to
 % estimate P, we can just set Time=2 with pi0 initalized uniformly, 
 % take large N_chain, and then calculate P_hat based on X(1,:) and X(2,:). 
 % In order to make sure we have an error (on average) less than 10^-3 for 
@@ -70,7 +70,7 @@ pi0 = ones(1,5)/5;
 % Let's calculate P_hat N times as explained above.
 prob_matrix_estimation = zeros(State_size, State_size, N);
 for k = 1:N
-    X = chain_1(N_chain, Time, pi0);
+    X = chain_2(N_chain, Time, pi0);
     prob_matrix_estimation_cur = estimate_transition_matrix(X, 1, State_size);
     prob_matrix_estimation(:, :, k) = prob_matrix_estimation_cur;
 end
@@ -105,11 +105,11 @@ plot(xlim(),[accuracy,accuracy]);
 hold off;
 
 P_hat = transpose(reshape(means,[State_size,State_size]));
-% saving P_hat in the file P_hat_chain_1.mat
-save('P_hat_chain_1.mat','P_hat');
+% saving P_hat in the file P_hat_chain_2.mat
+save('P_hat_chain_2.mat','P_hat');
 
-% loading P_hat from the file P_hat_chain_1.mat
-ld = load('P_hat_chain_1.mat');
+% loading P_hat from the file P_hat_chain_2.mat
+ld = load('P_hat_chain_2.mat');
 P_hat = ld.P_hat;
 
 %% c.2) Draw the underlying graph of the chain.
@@ -141,7 +141,7 @@ State_size = 5;
 N_chain = 100000;
 Time = 100;
 pi0 = ones(1,5)/5;
-X = chain_1(N_chain, Time, pi0);
+X = chain_2(N_chain, Time, pi0);
 
 % Calculating the distribution of states for each value of time.
 pi_t = estimate_distribution(X, Time, State_size);
@@ -166,140 +166,16 @@ hold off
 % in a way to have an error (on average) less than 10-3 for each element of pi - explain your 
 % approach. Furthermore, plot the values of the limiting distribution as a bar-plot.
 
-% Since our chain is ergodic, i.e. it is irreducible, positive recurrent (follows from having finite
-% and irreducible chain) and aperiodic (we have self-loops), hence there
-% exists a unique limiting distribution. Thus, we can take any initial
-% distribution, say uniform, and find the limiting distribution.
-
-State_size = 5;
-N_chain = 10^6;
-Time = 100;
-pi0 = ones(1,5)/5;
-X = chain_1(N_chain, Time, pi0);
-
-% Calculating the distribution of states for each value of time.
-pi_t = estimate_distribution(X, Time, State_size);
-
-window_size = 10;
-threshold = 10^-3;
-
-errors = zeros(Time - window_size, 1);
-state_errors = zeros(State_size, Time - window_size);
-
-for t = 1:Time - window_size
-    for state = 1:State_size
-        state_errors(state, t) = std(pi_t(state, t:t + window_size));
-    end
-    % taking the maximum of the variation over our states
-    errors(t) = max(state_errors(:, t));
-end
-
-figure
-title('Max std of state distribution on window of size 10')
-xlabel('Time')
-ylabel('STD')   
-hold on
-grid on
-set(gca, 'YScale', 'log')
-plot(1+window_size:Time, errors)
-hold off
-
-limiting_distr = zeros(State_size, 1);
-limiting_distr_slice = zeros(State_size, window_size);
-for t = 1:Time - window_size
-    if errors(t) < threshold
-        limiting_distr_slice = pi_t(:, t:t + window_size);
-        limiting_distr = mean(limiting_distr_slice, 2); 
-    end
-end
-
-figure
-title('Limiting distribution')
-xlabel('State')
-ylabel('Probability')   
-hold on
-grid on
-bar(limiting_distr)
-hold off
-
-% saving pi_hat in the file pi_hat_chain_1.mat 
-save('pi_hat_chain_1.mat','limiting_distr');
-
-% loading pi_hat from the file pi_hat_chain_1.mat
-ld = load('pi_hat_chain_1.mat');
-pi_hat = ld.limiting_distr;
+% As we can observe from the plot done in e), there is no limiting
+% distribution. After some time t0, if look at the sequence of the state distributions t>t0, 
+% we can see that for even values of t and for odd values of t, the
+% limit distribution is different, meaning that our sequence has no limit,
+% i.e. no limiting distribution exists.
 
 %% g) For the case where the limiting distribution pi exists, plot the total-variation distance over
 % time. Plot the total-variation distance over time also for the cases where X(0) = i, 
 % for each i in {1, 2, 3, 4, 5}. Which initial state has the worst convergence rate? Can you estimate 
 % (numerically) an upperbound for Te when e = 0.005?
-
-% Let's calculate total-variation distance for each value of time. 
-total_variation = zeros(Time, 1);
-for t = 1:Time
-    total_variation(t) = sum(abs(pi_t(:, t) - pi_hat)) / 2;
-end
-
-figure
-title('Total variation distance over time')
-xlabel('Time')
-ylabel('Total variation')   
-hold on
-grid on
-set(gca, 'YScale', 'log')
-plot(1:Time, total_variation)
-hold off
-
-State_size = 5;
-N_chain = 10^5;
-Time = 100;
-
-pi_ts = zeros(State_size, Time, State_size);
-for s = 1:State_size
-    pi0 = zeros(1,5);
-    pi0(s) = 1;
-    X = chain_1(N_chain, Time, pi0);
-    pi_ts(:, :, s) = estimate_distribution(X, Time, State_size);
-end
-
-total_variations = zeros(Time, State_size);
-for s = 1:State_size
-    for t = 1:Time
-        total_variations(t,s) = sum(abs(pi_ts(:, t, s) - pi_hat)) / 2;
-    end
-end
-
-figure
-title('Total variation distance over time')
-xlabel('Time')
-ylabel('Total variation')   
-hold on
-grid on
-set(gca, 'YScale', 'log')
-colors = ['k','b','r','g','m'];
-for s = 1:State_size
-    plot(1:Time, total_variations(:,s), 'color', colors(s))
-end
-legend('X0=1','X0=2','X0=3','X0=4','X0=5');
-hold off
-
-% Now, for each of our initial distributions, let's calculate the minimum time needed 
-% to have total variation distance less than eps = 0.005.
-eps = 0.005;
-conv_rates = zeros(State_size,1);
-for s = 1:State_size
-    for t = 1:Time
-        if total_variations(t,s)<eps
-            conv_rates(s) = t;
-            break;
-        end
-    end
-end
-
-fprintf('X0=%d state has the worst convergence rate\n',find(conv_rates(conv_rates==max(conv_rates))))
-
-T_eps = max(conv_rates);
-fprintf('An upper bound for T_eps = %d\n',T_eps);
 
 %% h) If the chain is time-homogeneous, find its stationary distribution using the eigenvalue
 % decomposition of your estimation of P. Check whether your findings are consistent with what you 
@@ -322,18 +198,3 @@ hold on
 grid on
 bar(stationary_dstrb)
 hold off
-
-% As we can see, our results are consistent, i.e. our limiting distribution
-% found from part f) is the 'same' as the stationary distribution calculated
-% from the eigenvalue decomposition of our transition matrix P_hat
-fprintf('Euclidean distance between p_hat and estimated stationary distribution = %d\n',...
-        sqrt(dot(transpose(pi_hat - stationary_dstrb),(pi_hat - stationary_dstrb))))
-
-% Let's now compute mixing time.
-eig_values = diag(D);
-alpha_star = max(abs(eig_values(2:State_size)));
-spectral_gap = 1 - alpha_star;
-
-mixing_time = - log(2 * eps * min(stationary_dstrb)) / spectral_gap;
-% As we can see, our results are consistent with what we found in g)
-fprintf('An upper bound for T_eps = %d\n',mixing_time);
