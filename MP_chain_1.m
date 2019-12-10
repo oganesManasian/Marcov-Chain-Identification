@@ -2,7 +2,7 @@ function X = MP_chain_1(N_chain, Time, pi_a, x0)
     % Loading transition probabilities from chain 1, since we are using
     % them for base chain
     ld = load('P_hat_chain_1.mat');
-    prob_matrix = ld.P_hat';
+    prob_matrix = ld.P_hat;
     
     % Since state space is quite small (only 5 possible states, let's 
     % compute of the whole new transition matrix
@@ -18,11 +18,11 @@ function X = MP_chain_1(N_chain, Time, pi_a, x0)
     end
         
     % Generating chain realisations
-    X = zeros(Time + 1, N_chain);
+    X = zeros(Time, N_chain);
     X(1, :) = x0; % Set initial state
     
     for chain_ind = 1:N_chain
-        for time = 2:Time + 1
+        for time = 2:Time
             prev_state = X(time - 1, chain_ind);
             trans_prob_from_prev_state = prob_matrix_new(prev_state, :);
             X(time, chain_ind) = randsrc(1, 1, [1, 2, 3, 4, 5; trans_prob_from_prev_state]);

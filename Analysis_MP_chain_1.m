@@ -13,6 +13,7 @@ workspace;  % Make sure the workspace panel is showing.
 % and chain 4.p)
 
 % Chains 1, 2 are time-homogeneous, let's analyze them
+% Let's analyse chain 1
 
 %% a) Write a function as X = MP_chain_i(N_chain, Time, pi_a, x0) which produces N_chain ? N
 % realisations of the modified version (in a way to have the limiting distribution pi_a) of chain i with
@@ -42,8 +43,8 @@ pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
-Time = 300;
-N_chain = 1000;
+Time = 10;
+N_chain = 100;
 state_size = 5;
 
 for pi_a_ind = 1:size(pi_a_all, 1)
@@ -52,9 +53,10 @@ for pi_a_ind = 1:size(pi_a_all, 1)
     for init_state = 1:5    
         X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
 %         X = MP_chain_1_v2(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
-        
-        limiting_distribution = estimate_distribution(X, Time, state_size)';
 
+        distribution = estimate_distribution(X, Time, state_size);
+        limiting_distribution = distribution(:, Time)';
+        
         err_mae = mae(pi_a_all(pi_a_ind, :), limiting_distribution);
         fprintf('For initial state %d error is %f\n', init_state, err_mae)
         
@@ -69,19 +71,22 @@ end
 %% b.2) Plot the total variation distance over time, and analyze the effect 
 % of the initial state x0 on the convergence rate of the algorithm. Does it
 % depend on the desired distribution pi_a? If yes, explain how.
+Time = 10;
+N_chain = 100;
+state_size = 5;
 
 % Compute TV
 total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
 for pi_a_ind = 1:size(pi_a_all, 1)
     for init_state = 1:state_size
-        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
+        pi_a = pi_a_all(pi_a_ind, :);
         
-        for time = 1:size(X, 1)
-            cur_distribution = estimate_distribution(X, time, state_size)';
-            total_variation(pi_a_ind, time, init_state) = ...
-                sum(abs(pi_a_all(pi_a_ind, :) - cur_distribution)) / 2; 
-        end
+        X = MP_chain_1(N_chain, Time, pi_a_all(pi_a_ind, :), init_state);
+
+        estimated_distrubution = estimate_distribution(X, Time, state_size);
+        total_variation(pi_a_ind, :, init_state) = ...
+                sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
     end
 end
 
@@ -92,7 +97,7 @@ figure
 for pi_a_ind = 1:size(pi_a_all, 1)
     subplot(3, 1, pi_a_ind)
     title(pi_a_desc(pi_a_ind))
-    xlim([0 size(X, 1)])
+    xlim([1 size(X, 1)])
     xlabel('Time')
     ylabel('Total variation')
     hold on

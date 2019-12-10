@@ -143,6 +143,7 @@ hold off
 
 %% d) If it is not time-homogeneous, explain the dynamics of P(t) over time, e.g. how it changes,
 % whether it converges, etc.
+
 %% e) When pi0 is an uniform distribution, estimate pi(t) (i.e. the distribution of states at time t,
 % i.e. X(t+1,:)), and plot the values of its elements over time.
 
@@ -152,14 +153,9 @@ Time = 100;
 pi0 = ones(1,5)/5;
 X = chain_1(N_chain, Time, pi0);
 
-pi_t = zeros(State_size, Time);
-for time = 1:Time
-%     fprintf('Time %i', time)
-    pi_t(:, time) = estimate_distribution(X, time, State_size);
-%     display(pi_t)
-end
+pi_t = estimate_distribution(X, Time, State_size);
 
-% Lets draw state distribution over time
+%% Lets draw state distribution over time
 figure
 hold on
 grid on
@@ -190,10 +186,7 @@ Time = 100;
 pi0 = ones(1,5)/5;
 X = chain_1(N_chain, Time, pi0);
 
-pi_t = zeros(State_size, Time);
-for time = 1:Time
-    pi_t(:, time) = estimate_distribution(X, time, State_size);
-end
+pi_t = estimate_distribution(X, Time, State_size);
 
 window_size = 10;
 threshold = 10^-3;
@@ -208,7 +201,7 @@ for t = 1:Time - window_size - 1
     errors(t) = max(state_errors(:, t));
 end
 
-
+%%
 figure
 title('Max std of dist on window of size 10')
 xlabel('Time')
@@ -230,6 +223,7 @@ for t = 1:Time - window_size - 1
     end
 end
 
+%%
 figure
 title('Limiting distribution')
 xlabel('State')
@@ -276,9 +270,9 @@ for s = 1:State_size
     pi0 = zeros(1,5);
     pi0(s) = 1;
     X = chain_1(N_chain, Time, pi0);
-    for time = 1:Time
-        pi_ts(:, time, s) = estimate_distribution(X, time, State_size);
-    end
+    
+    pi_ts(:, :, s) = estimate_distribution(X, Time, State_size);
+
     disp(s)
 end
 
