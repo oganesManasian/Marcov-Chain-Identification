@@ -13,7 +13,7 @@ workspace;  % Make sure the workspace panel is showing.
 % and chain 4.p)
 
 % Chains 1, 2 are time-homogeneous, let's analyze them
-% Let's analyse chain 1
+% Let's analyse chain 2
 
 %% a) Write a function as X = MP_chain_i(N_chain, Time, pi_a, x0) which produces N_chain ? N
 % realisations of the modified version (in a way to have the limiting distribution pi_a) of chain i with
@@ -27,7 +27,7 @@ pi_a = [16,8,4,2,1]/31;
 x0 = 1;
 Time = 10;
 N_chain = 10;
-X = MP_chain_1(N_chain, Time, pi_a, x0);
+X = MP_chain_2(N_chain, Time, pi_a, x0);
 
 %%  b) For each of your chains, and for each of the cases
 % 1. pi_a = [16,8,4,2,1]/31;
@@ -64,7 +64,7 @@ for pi_a_ind = 1:size(pi_a_all, 1)
     for init_state = 1:state_size
         pi_a = pi_a_all(pi_a_ind, :);
         
-        X = MP_chain_1(N_chain, Time, pi_a, init_state);
+        X = MP_chain_2(N_chain, Time, pi_a, init_state);
         
         estimated_distrubution = estimate_distribution(X, Time, state_size);
         total_variation(pi_a_ind, :, init_state) = ...
@@ -97,10 +97,16 @@ legend('show');
 hold off
 
 % From plot we can see that both desired distribution and initial state
-% effect on convergence rate. We can point out two observations: 
-% First, the more desired distribution is close to uniform distribution,
-% the faster chain converges if we consider average convergence rate among
-% all initial states.
+% effect on convergence rate. Also we think that base chain limiting 
+% distribution also have to be taken into account. 
+% We can point out two main observations: 
+% First, since base chain has non zero transition probabilities only for
+% neighboring states, new chain converges fastes when in desired
+% distribution most probable states are neighboring. As an instances we see
+% how fast chain converges in option 1 of desired distribution where most
+% probable states are 1 and 2. Conversely, mixing time of chain with option
+% 3 of desired distribution, where most probable states are 1 and 5,
+% is the highest.
 % Second, the more state is likely in desired distribution, the faster
 % chain converges if we pick this state as initial.
 
