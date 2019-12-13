@@ -1,5 +1,5 @@
 function pi_t = estimate_distribution(X, Time, state_size)
-    % Estimates distribution of states for each time moment from 1 to Time
+    % Estimates state distribution in time
     % Returns matrix of shape (state_size, Time)
 
     assert(size(X, 1) == Time)

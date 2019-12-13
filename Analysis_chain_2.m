@@ -14,14 +14,13 @@ X = chain_2(N_chain, Time, pi0);
 % Let's estimate transition probability matrix for each value of time.
 prob_matrix_estimation = zeros(State_size, State_size, Time - 1);
 for time = 1:Time-1
-    prob_matrix_estimation_cur = estimate_transition_matrix(X, time, State_size);
-    prob_matrix_estimation(:, :, time) = prob_matrix_estimation_cur;
+    prob_matrix_estimation(:, :, time) = estimate_transition_matrix(X, time, State_size);
 end
 
-% Now, let's plot how the entries of transition probability matrices change
+% Now, plot how the entries of transition probability matrices change
 % over time t.
 figure
-title('Transition probabilities')
+title('Transition probabilities of chain 2')
 xlabel('Time')
 ylabel('Probability')   
 hold on
@@ -29,11 +28,7 @@ grid on
 
 for i = 1:State_size
     for j = 1:State_size
-        values = zeros(Time - 1, 1);
-        for k = 1:Time - 1
-            values(k) = prob_matrix_estimation(i, j, k);
-        end
-        plot(1:Time-1, values)
+        plot(1:Time-1,  squeeze(prob_matrix_estimation(i, j, :)))
     end
 end
 
