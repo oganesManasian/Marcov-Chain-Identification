@@ -33,7 +33,6 @@ for i = 1:State_size
 end
 
 hold off
-
 %% b) Is this chain time-homogeneous?
 
 % Yes, from the plot we can observe that chain 2 is time-homogeneous, as the entries of the transition probability 
@@ -91,7 +90,7 @@ end
 % Let's plot the stds for each entry of P and see that all values are less
 % than 10^-3.
 figure
-xlabel('Entries of matrix P');
+xlabel('Entries of matrix P for chain 2');
 ylabel('Standard Deviation');
 hold on;
 grid on;
@@ -109,23 +108,10 @@ P_hat = ld.P_hat;
 
 %% c.2) Draw the underlying graph of the chain.
 
-figure
-title('Transition probabilities')
-xlabel('N')
-ylabel('Probability') 
-hold on
-grid on
-for i = 1:State_size
-    for j = 1:State_size
-        values = zeros(N, 1);
-        for k = 1:N
-            values(k) = prob_matrix_estimation(i, j, k);
-        end
-        plot(1:N, values)
-    end
-end
-hold off
+mc = dtmc(P_hat);
 
+figure;
+graphplot(mc, 'ColorNodes',true,'ColorEdges',true);
 %% d) If it is not time-homogeneous, explain the dynamics of P(t) over time, e.g. how it changes,
 % whether it converges, etc.
 
@@ -145,7 +131,7 @@ pi_t = estimate_distribution(X, Time, State_size);
 figure
 hold on
 grid on
-title('State distribution')
+title('State distribution of chain 2')
 xlabel('Time')
 ylabel('Probability')
 colors = ['k','b','r','g','m'];
@@ -155,7 +141,6 @@ end
 
 legend('show');
 hold off
-
 %% f) Does there exist any limiting distribution for this chain? If yes, save it as the variable 
 % pi_hat in the file pi_hat_chain_i.mat where i is the number of the chain. Choose N_chain and Time 
 % in a way to have an error (on average) less than 10-3 for each element of pi - explain your 
@@ -166,7 +151,6 @@ hold off
 % we can see that for even values of t and for odd values of t, the
 % limit distribution is different, meaning that our sequence has no limit,
 % i.e. no limiting distribution exists.
-
 %% g) For the case where the limiting distribution pi exists, plot the total-variation distance over
 % time. Plot the total-variation distance over time also for the cases where X(0) = i, 
 % for each i in {1, 2, 3, 4, 5}. Which initial state has the worst convergence rate? Can you estimate 
@@ -186,7 +170,7 @@ hold off
 stationary_dstrb = W(:,1) / sum(W(:,1));
 
 figure
-title('Stationary distribution')
+title('Stationary distribution of chain 2')
 xlabel('State')
 ylabel('Probability')   
 hold on

@@ -78,6 +78,18 @@ hold off
 
 % Indeed, our intuition was right – the transition matrix 
 % is alternation of twomatrices P1, P2, P1, P2 ...
+% Let's find this matrices
+
+P1 = mean(prob_matrix_estimation(:, :, 1:2:Time-1), 3);
+P2 = mean(prob_matrix_estimation(:, :, 2:2:Time-1), 3);
+
+mc = dtmc(P1);
+figure;
+graphplot(mc, 'ColorNodes',true,'ColorEdges',true);
+
+mc = dtmc(P2);
+figure;
+graphplot(mc, 'ColorNodes',true,'ColorEdges',true);
 %% e) When pi0 is an uniform distribution, estimate pi(t) (i.e. the distribution of states at time t,
 % i.e. X(t+1,:)), and plot the values of its elements over time.
 

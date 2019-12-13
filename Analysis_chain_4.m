@@ -52,7 +52,7 @@ for time = 1:Time-1
 end
 
 figure
-title('Total variation of transition matrix in time for chain 4')
+title('TV of transition matrix and limiting matrix chain 4')
 xlabel('Time')
 ylabel('Probability')   
 hold on
@@ -73,7 +73,7 @@ pi_t = estimate_distribution(X, Time, State_size);
 figure
 hold on
 grid on
-title('State distribution')
+title('State distribution of chain 4')
 xlabel('Time')
 ylabel('Probability')
 colors = ['k','b','r','g','m'];
@@ -100,7 +100,7 @@ N_chain = 10^6;
 Time = 200;
 X = chain_4(N_chain, Time, pi0);
 
-%% Calculating the distribution of states for each value of time.
+% Calculating the distribution of states for each value of time.
 pi_t = estimate_distribution(X, Time, State_size);
 
 window_size = 20;
@@ -137,7 +137,7 @@ for t = 1:Time - window_size
 end
 
 figure
-title('Limiting distribution')
+title('Limiting distribution of chain 4')
 xlabel('State')
 ylabel('Probability')   
 hold on
@@ -145,10 +145,10 @@ grid on
 bar(limiting_distr)
 hold off
 
-% saving pi_hat in the file pi_hat_chain_1.mat 
+% saving pi_hat in the file pi_hat_chain_4.mat 
 save('pi_hat_chain_4.mat','limiting_distr');
 
-% loading pi_hat from the file pi_hat_chain_1.mat
+% loading pi_hat from the file pi_hat_chain_4.mat
 ld = load('pi_hat_chain_4.mat');
 pi_hat = ld.limiting_distr;
 %% g) For the case where the limiting distribution pi exists, plot the total-variation distance over
@@ -163,7 +163,7 @@ for t = 1:Time
 end
 
 figure
-title('Total variation distance over time')
+title('TV for uniform initial dist. for chain 4')
 xlabel('Time')
 ylabel('Total variation')   
 hold on
@@ -194,7 +194,7 @@ for s = 1:State_size
 end
 
 figure
-title('Total variation distance over time')
+title('TV for X(0) = i initial distribution for chain 4')
 xlabel('Time')
 ylabel('Total variation')   
 hold on
@@ -221,6 +221,7 @@ for s = 1:State_size
 end
 
 fprintf('X0=%d state has the worst convergence rate\n',find(conv_rates(conv_rates==max(conv_rates))))
-
+% X0=1 state has the worst convergence rate
 T_eps = max(conv_rates);
 fprintf('An upper bound for T_eps = %d\n',T_eps);
+% An upper bound for T_eps = 105

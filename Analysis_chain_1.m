@@ -90,6 +90,7 @@ end
 % Let's plot the stds for each entry of P and see that all values are less
 % than 10^-3.
 figure
+title('STD of estimated transtion probabilities for chain 1')
 xlabel('Entries of matrix P');
 ylabel('Standard Deviation');
 hold on;
@@ -108,22 +109,10 @@ P_hat = ld.P_hat;
 
 %% c.2) Draw the underlying graph of the chain.
 
-figure
-title('Transition probabilities')
-xlabel('N')
-ylabel('Probability') 
-hold on
-grid on
-for i = 1:State_size
-    for j = 1:State_size
-        values = zeros(N, 1);
-        for k = 1:N
-            values(k) = prob_matrix_estimation(i, j, k);
-        end
-        plot(1:N, values)
-    end
-end
-hold off
+mc = dtmc(P_hat);
+
+figure;
+graphplot(mc, 'ColorNodes',true,'ColorEdges',true);
 
 %% d) If it is not time-homogeneous, explain the dynamics of P(t) over time, e.g. how it changes,
 % whether it converges, etc.
@@ -144,7 +133,7 @@ pi_t = estimate_distribution(X, Time, State_size);
 figure
 hold on
 grid on
-title('State distribution')
+title('State distribution of chain 1')
 xlabel('Time')
 ylabel('Probability')
 colors = ['k','b','r','g','m'];
@@ -154,7 +143,6 @@ end
 
 legend('show');
 hold off
-
 %% f) Does there exist any limiting distribution for this chain? If yes, save it as the variable 
 % pi_hat in the file pi_hat_chain_i.mat where i is the number of the chain. Choose N_chain and Time 
 % in a way to have an error (on average) less than 10-3 for each element of pi - explain your 
@@ -235,7 +223,7 @@ for t = 1:Time
 end
 
 figure
-title('Total variation distance over time')
+title('TV for uniform initial dist. for chain 1')
 xlabel('Time')
 ylabel('Total variation')   
 hold on
@@ -264,9 +252,9 @@ for s = 1:State_size
 end
 
 figure
-title('Total variation distance over time')
+title('TV for X(0) = i initial distribution for chain 1')
 xlabel('Time')
-ylabel('Total variation')   
+ylabel('Toral variation')   
 hold on
 grid on
 set(gca, 'YScale', 'log')
@@ -294,6 +282,7 @@ fprintf('X0=%d state has the worst convergence rate\n',find(conv_rates(conv_rate
 
 T_eps = max(conv_rates);
 fprintf('An upper bound for T_eps = %d\n',T_eps);
+% An upper bound for T_eps = 62
 
 %% h) If the chain is time-homogeneous, find its stationary distribution using the eigenvalue
 % decomposition of your estimation of P. Check whether your findings are consistent with what you 
@@ -322,6 +311,7 @@ hold off
 % from the eigenvalue decomposition of our transition matrix P_hat
 fprintf('Euclidean distance between p_hat and estimated stationary distribution = %d\n',...
         sqrt(dot(transpose(pi_hat - stationary_dstrb),(pi_hat - stationary_dstrb))))
+% Euclidean distance between p_hat and estimated stationary distribution = 3.942508e-04
 
 % Let's now compute mixing time.
 eig_values = diag(D);
@@ -331,3 +321,4 @@ spectral_gap = 1 - alpha_star;
 mixing_time = - log(2 * eps * min(stationary_dstrb)) / spectral_gap;
 % As we can see, our results are consistent with what we found in g)
 fprintf('An upper bound for T_eps = %d\n',mixing_time);
+% An upper bound for T_eps = 1.045425e+02
