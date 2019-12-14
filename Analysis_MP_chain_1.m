@@ -44,10 +44,9 @@ total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
 for pi_a_ind = 1:size(pi_a_all, 1)
     disp(pi_a_desc(pi_a_ind))
+    pi_a = pi_a_all(pi_a_ind, :);
     
     for init_state = 1:state_size
-        pi_a = pi_a_all(pi_a_ind, :);
-        
         X = MP_chain_1(N_chain, Time, pi_a, init_state);
         
         estimated_distrubution = estimate_distribution(X, Time, state_size);
@@ -55,7 +54,7 @@ for pi_a_ind = 1:size(pi_a_all, 1)
                 sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
         
         error = total_variation(pi_a_ind, Time, init_state);
-        fprintf('For initial state %d error is %f\n', init_state, error)
+%         fprintf('For initial state %d error is %f\n', init_state, error)
     end
 end
 
@@ -114,18 +113,144 @@ hold off
 % converges if we consider average convergence rate among all initial states.
 % Second, the higher state probability in desired distribution, the faster
 % chain converges if we pick this state as initial.
+%% Extra plot. Total variation when uniform distribution is initial
+Time = 150;
+N_chain = 10^5;
+state_size = 5;
+
+x0 = randsrc(1, N_chain, [1, 2, 3, 4, 5; 0.2, 0.2, 0.2, 0.2, 0.2]);
+
+total_variation_uniform = zeros(size(pi_a_all, 1), Time);
+
+for pi_a_ind = 1:size(pi_a_all, 1)
+    disp(pi_a_desc(pi_a_ind))
+    pi_a = pi_a_all(pi_a_ind, :);
+    
+    X = MP_chain_1(N_chain, Time, pi_a, x0);
+        
+    estimated_distrubution = estimate_distribution(X, Time, state_size);
+    total_variation_uniform(pi_a_ind, :) = ...
+        sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
+end
+
+%% Extra plot. Total variation when dominant distribution is initial
+dominant_value = 0.9;
+recessive_value = (1 - dominant_value) / (state_size - 1);
+total_variation_dominant = zeros(size(pi_a_all, 1), Time, state_size);
+
+for pi_a_ind = 1:size(pi_a_all, 1)
+    disp(pi_a_desc(pi_a_ind))
+    pi_a = pi_a_all(pi_a_ind, :);
+    
+    for dominant_state = 1:state_size
+        distr_matr = [1, 2, 3, 4, 5; ...
+            recessive_value, recessive_value, recessive_value, recessive_value, recessive_value];
+        distr_matr(2, dominant_state) = dominant_value;
+        x0 = randsrc(1, N_chain, distr_matr);
+    
+        X = MP_chain_1(N_chain, Time, pi_a, x0);
+        
+        estimated_distrubution = estimate_distribution(X, Time, state_size);
+        total_variation_dominant(pi_a_ind, :, dominant_state) = ...
+                sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
+    end
+end
+
+%% Extra plot. Total variation when limiting distribution is initial
+x0 = randsrc(1, N_chain, [1, 2, 3, 4, 5; 0.3, 0.05, 0.05, 0.3, 0.3]);
+
+total_variation_limiting = zeros(size(pi_a_all, 1), Time);
+
+for pi_a_ind = 1:size(pi_a_all, 1)
+    disp(pi_a_desc(pi_a_ind))
+    pi_a = pi_a_all(pi_a_ind, :);
+        
+    X = MP_chain_1(N_chain, Time, pi_a, x0);
+        
+    estimated_distrubution = estimate_distribution(X, Time, state_size);
+    total_variation_limiting(pi_a_ind, :) = ...
+        sum(abs(repmat(pi_a', 1, Time) - estimated_distrubution)) / 2; 
+end
+
+%% Extra plot 1.
+colors = ['k','b','r','g','m'];
+
+figure
+title('Extra plot. Total Variation for different initial distributions')
+for pi_a_ind = 1:size(pi_a_all, 1)
+    subplot(3, 1, pi_a_ind) 
+    title(pi_a_desc(pi_a_ind))
+    xlim([1 min(60, size(X, 1))]) % After Time=60 curve is very close to 0
+    xlabel('Time')
+    ylabel('Total variation')
+%     set(gca, 'YScale', 'log')
+    hold on
+    grid on
+
+    plot(1:size(X, 1), total_variation_uniform(pi_a_ind, :), ...
+        'displayName', 'Uniform', 'color', 'k', 'lineStyle', '^')
+    for dominant_state = 1:state_size
+        plot(1:size(X, 1), total_variation_dominant(pi_a_ind, :, dominant_state), ...
+            'displayName', sprintf('%i as dominant state', dominant_state), ...
+            'color', colors(dominant_state))
+    end
+    plot(1:size(X, 1), total_variation_limiting(pi_a_ind, :), ...
+        'displayName', 'Limiting', 'color', 'k', 'lineStyle', '*')
+end
+legend('show');
+hold off
+
+%% Extra plot 2.
+colors = ['k','b','r','g','m'];
+
+figure
+title('Extra plot. Total Variation for uniform as initial distribution')
+xlim([1 min(60, size(X, 1))]) % After Time=60 curve is very close to 0
+xlabel('Time')
+ylabel('Total variation')
+% set(gca, 'YScale', 'log')
+hold on
+grid on
+    
+for pi_a_ind = 1:size(pi_a_all, 1)
+    plot(1:size(X, 1), total_variation_uniform(pi_a_ind, :), ...
+        'displayName', pi_a_desc(pi_a_ind), ...
+        'color', colors(pi_a_ind), 'lineStyle', '^')
+end
+legend('show');
+hold off
+
+%% Extra plot 3.
+colors = ['k','b','r','g','m'];
+
+figure
+title('Extra plot. Total Variation when limiting is initial distribution')
+xlim([1 min(60, size(X, 1))]) % After Time=60 curve is very close to 0
+xlabel('Time')
+ylabel('Total variation')
+% set(gca, 'YScale', 'log')
+hold on
+grid on
+    
+for pi_a_ind = 1:size(pi_a_all, 1)
+    plot(1:size(X, 1), total_variation_limiting(pi_a_ind, :), ...
+        'displayName', pi_a_desc(pi_a_ind), ...
+        'color', colors(pi_a_ind), 'lineStyle', '*')
+end
+legend('show');
+hold off
 
 %% b.3) For each distribution pi_a, can you estimate (numerically) an upper-bound for Te when
 % e = 0.005?
 eps = 0.005;
 
-fprintf('Computing mixing time')
+fprintf('Computing mixing time\n')
 for pi_a_ind = 1:size(pi_a_all, 1)
     disp(pi_a_desc(pi_a_ind))
     
     for time = 1:size(total_variation, 2)
         if max(total_variation(pi_a_ind, time, :)) < eps
-            fprintf(sprintf('Mixing time is %d', time))
+            fprintf(sprintf('Mixing time is %d\n', time))
             break
         end
         
