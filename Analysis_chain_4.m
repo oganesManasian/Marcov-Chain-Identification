@@ -62,6 +62,10 @@ plot(1:Time-1,  total_variation);
 
 hold off
 
+mc = dtmc(limiting_transition_matrix);
+figure;
+graphplot(mc, 'ColorNodes',true,'ColorEdges',true);
+
 % Indeed, we see that the total distance is exponentially decreasing in time!
 %% e) When pi0 is an uniform distribution, estimate pi(t) (i.e. the distribution of states at time t,
 % i.e. X(t+1,:)), and plot the values of its elements over time.

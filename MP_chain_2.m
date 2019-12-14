@@ -5,7 +5,7 @@ function X = MP_chain_2(N_chain, Time, pi_a, x0)
     trans_prob = ld.P_hat;
     
     % Since state space is quite small (only 5 possible states, let's 
-    % compute of the whole new transition matrix
+    % compute the whole new transition matrix
     state_size = size(trans_prob, 1);
     nominator = repmat(pi_a, state_size, 1) .* trans_prob';
     denominator = nominator';

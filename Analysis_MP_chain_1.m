@@ -20,15 +20,6 @@ workspace;  % Make sure the workspace panel is showing.
 % length Time ? N and initial state X0 = x0. Note that you are not allowed to directly sample from
 % pi_a. The function should be saved as MP_chain_i.m.
 
-% Check applicability of Metropolis-Hasting algorithm ??? Check that matrix
-% is symmetric
-
-pi_a = [16,8,4,2,1]/31;
-x0 = 1;
-Time = 10;
-N_chain = 10;
-X = MP_chain_1(N_chain, Time, pi_a, x0);
-
 %%  b) For each of your chains, and for each of the cases
 % 1. pi_a = [16,8,4,2,1]/31;
 % 2. pi_a = [1,1,4,1,1]/8;
@@ -44,13 +35,6 @@ pi_a_all = [[16,8,4,2,1]/31; [1,1,4,1,1]/8; [4,2,1,2,4]/13];
 %% b.1) Evaluate your code, i.e. show that your modified chain has a limiting distribution equal to
 % pi_a for all choices of the initial state x0.
 
-% Since value of total variation at moment T where T is good enough can be
-% an evidence that modified chain has needed limiting distribution, we
-% decided to join tasks b.1 and b.2
-
-%% b.2) Plot the total variation distance over time, and analyze the effect 
-% of the initial state x0 on the convergence rate of the algorithm. Does it
-% depend on the desired distribution pi_a? If yes, explain how.
 Time = 150;
 N_chain = 10^5;
 state_size = 5;
@@ -59,7 +43,7 @@ state_size = 5;
 total_variation = zeros(size(pi_a_all, 1), Time, state_size);
 
 for pi_a_ind = 1:size(pi_a_all, 1)
-    display(pi_a_desc(pi_a_ind))
+    disp(pi_a_desc(pi_a_ind))
     
     for init_state = 1:state_size
         pi_a = pi_a_all(pi_a_ind, :);
@@ -75,56 +59,87 @@ for pi_a_ind = 1:size(pi_a_all, 1)
     end
 end
 
+% 'Desired distribution: [16,8,4,2,1]/31'
+% For initial state 1 error is 0.002663
+% For initial state 2 error is 0.002685
+% For initial state 3 error is 0.002374
+% For initial state 4 error is 0.003217
+% For initial state 5 error is 0.001788
+%    'Desired distribution: [1,1,4,1,1]/8'
+% For initial state 1 error is 0.002810
+% For initial state 2 error is 0.002530
+% For initial state 3 error is 0.001690
+% For initial state 4 error is 0.001860
+% For initial state 5 error is 0.000850
+%    'Desired distribution: [4,2,1,2,4]/13'
+% For initial state 1 error is 0.001488
+% For initial state 2 error is 0.002425
+% For initial state 3 error is 0.001832
+% For initial state 4 error is 0.001891
+% For initial state 5 error is 0.002469
+
+% Value of total variation at time 150 are very small for each
+% initial state and thus pi_a are indeed limiting distributions
+
+%% b.2) Plot the total variation distance over time, and analyze the effect 
+% of the initial state x0 on the convergence rate of the algorithm. Does it
+% depend on the desired distribution pi_a? If yes, explain how.
+
 %% Plot TV
 colors = ['k','b','r','g','m'];
 
 figure
+title('Total Variation for different initial and limiting distributions')
 for pi_a_ind = 1:size(pi_a_all, 1)
     subplot(3, 1, pi_a_ind) 
     title(pi_a_desc(pi_a_ind))
     xlim([1 min(60, size(X, 1))]) % After Time=60 curve is very close to 0
     xlabel('Time')
     ylabel('Total variation')
+    set(gca, 'YScale', 'log')
     hold on
     grid on
     for init_state = 1:state_size
         plot(1:size(X, 1), total_variation(pi_a_ind, :, init_state), ...
-            'DisplayName', sprintf('%i initial state', init_state), ...
+            'displayName', sprintf('%i initial state', init_state), ...
             'color', colors(init_state))
     end
 end
 legend('show');
 hold off
 
-% From plot we can see that both desired distribution and initial state
-% effect on convergence rate. We can point out two observations: 
-% First, the more desired distribution is close to uniform distribution,
-% the faster chain converges if we consider average convergence rate among
-% all initial states.
-% Second, the more state is likely in desired distribution, the faster
+% From the plot we can see that both desired distribution and initial state
+% affect the convergence rate. We can point out two observations: 
+% First, the closer desired distribution to uniform, the faster chain 
+% converges if we consider average convergence rate among all initial states.
+% Second, the higher state probability in desired distribution, the faster
 % chain converges if we pick this state as initial.
 
 %% b.3) For each distribution pi_a, can you estimate (numerically) an upper-bound for Te when
 % e = 0.005?
 eps = 0.005;
 
-display('Computing mixing time')
+fprintf('Computing mixing time')
 for pi_a_ind = 1:size(pi_a_all, 1)
-    display(pi_a_desc(pi_a_ind))
+    disp(pi_a_desc(pi_a_ind))
     
     for time = 1:size(total_variation, 2)
         if max(total_variation(pi_a_ind, time, :)) < eps
-            display(sprintf('Mixing time is %d', time))
+            fprintf(sprintf('Mixing time is %d', time))
             break
         end
         
         if time == size(total_variation, 2)
-            display('Mixing time was not found. Please increase considering time')
+            fprintf('Mixing time was not found. Please increase considering time')
             fprintf('TV on max time is %d\n', max(total_variation(pi_a_ind, time, :)))
         end
     end
 end
 
+% Computing mixing time    
+% 'Desired distribution: [16,8,4,2,1]/31' Mixing time is 80    
+% 'Desired distribution: [1,1,4,1,1]/8'   Mixing time is 88    
+% 'Desired distribution: [4,2,1,2,4]/13'  Mixing time is 109
 %% c) For each of the three choices of pi_a in part b), which chain has a 
 % better convergence rate? Can you explain your observations intuitively?
 
