@@ -90,13 +90,20 @@ end
 % Let's plot the stds for each entry of P and see that all values are less
 % than 10^-3.
 figure
+x = repelem([1:State_size],State_size);
+y = repmat([1:State_size],[1,State_size]);
+plot3(x,y,stds,'.','Color','b','MarkerSize',30);
+xlabel('i');
+ylabel('j');
 title('STD of estimated transtion probabilities for chain 1')
-xlabel('Entries of matrix P');
-ylabel('Standard Deviation');
-hold on;
+zlabel('std');
 grid on;
-plot(stds,'o');
-plot(xlim(),[accuracy,accuracy]);
+
+hold on
+[x1,y1] = meshgrid(1:State_size,1:State_size);
+z1 = accuracy*ones(length(y1),length(x1));
+s = surf(x1,y1,z1,'FaceAlpha',0.3);
+s.EdgeColor = 'none';
 hold off;
 
 P_hat = transpose(reshape(means,[State_size,State_size]));
